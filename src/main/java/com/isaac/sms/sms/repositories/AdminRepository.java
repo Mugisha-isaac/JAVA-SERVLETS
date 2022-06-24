@@ -5,14 +5,36 @@ import com.isaac.sms.sms.models.Admin;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class AdminRepository extends DbConnector {
-      public Admin save(Admin admin){
-           return null;
+      public Optional<Admin> save(Admin admin)  {
+          try {
+              String sql = "INSERT INTO admins(firstName,lastName,email,password) values (?,?,?,?)";
+              PreparedStatement statement = getConnection().prepareStatement(sql);
+              statement.setString(1, admin.getFirstName());
+              statement.setString(2, admin.getLastName());
+              statement.setString(3, admin.getEmail());
+              statement.setString(4, admin.getPassword());
+
+              int insertedCount = statement.executeUpdate();
+
+              if(insertedCount <1){
+                  return Optional.empty();
+              }
+
+              return findByEmail(admin.getEmail());
+
+          }
+          catch (Exception e){
+              System.out.println("Exception" + e.getMessage());
+              return Optional.empty();
+          }
+
       }
 
       public ArrayList<Admin> getAllAdmins(){
